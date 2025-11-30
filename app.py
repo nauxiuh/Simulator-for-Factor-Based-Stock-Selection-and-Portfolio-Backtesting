@@ -26,7 +26,9 @@ if st.button("Run Simulation"):
         st.stop()
 
     st.write("Loading data...")
-    raw_data = yf.download(tickers, period="5y")  # auto_adjust=True by default now
+
+    # Explicitly set auto_adjust=True to avoid Adj Close issues
+    raw_data = yf.download(tickers, period="5y", auto_adjust=True)
 
     if raw_data.empty:
         st.error("No data was downloaded. Please check your tickers or try again later.")
@@ -34,7 +36,7 @@ if st.button("Run Simulation"):
 
     # Handle both single-index and multi-index column formats from yfinance
     if isinstance(raw_data.columns, pd.MultiIndex):
-        # For multiple tickers: columns like (ticker, field), e.g. ('AAPL', 'Close')
+        # For multiple tickers: columns like (ticker, field)
         try:
             price_df = raw_data.xs("Close", level=1, axis=1)
         except KeyError:
@@ -43,19 +45,12 @@ if st.button("Run Simulation"):
             st.stop()
     else:
         # For a single ticker: columns like ['Open','High','Low','Close',...]
-        col_to_use = None
-        if "Adj Close" in raw_data.columns:
-            col_to_use = "Adj Close"
-        elif "Close" in raw_data.columns:
-            col_to_use = "Close"
-
-        if col_to_use is None:
-            st.error("Downloaded data does not contain 'Close' or 'Adj Close' columns.")
+        if "Close" not in raw_data.columns:
+            st.error("Downloaded data does not contain a 'Close' column.")
             st.write("Columns found:", list(raw_data.columns))
             st.stop()
-
-        adj_or_close = raw_data[col_to_use]
-        price_df = adj_or_close.to_frame() if not isinstance(adj_or_close, pd.DataFrame) else adj_or_close
+        close_series = raw_data["Close"]
+        price_df = close_series.to_frame() if not isinstance(close_series, pd.DataFrame) else close_series
 
     # Drop rows with missing prices
     price_df = price_df.dropna(how="any")
@@ -79,7 +74,6 @@ if st.button("Run Simulation"):
 
             mcaps[t] = latest_price * latest_shares
         except Exception as e:
-            # Fallback so the app still runs even if shares data is missing
             st.warning(f"Could not fetch full shares data for {t}: {e}. Using fallback market cap.")
             latest_price = float(price_df[t].iloc[-1])
             mcaps[t] = latest_price * 1e9  # assume 1 billion shares as a rough placeholder
