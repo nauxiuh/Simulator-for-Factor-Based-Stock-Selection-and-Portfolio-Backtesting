@@ -4,7 +4,8 @@
 
 ## Overview
 
-This app provides a hands-on environment for exploring systematic factor-based investing. It retrieves **5 years of adjusted close prices** and **live market capitalisation data** for any user-selected stock tickers, then computes three investment factors: **12-month momentum**, **annualised volatility**, and **size**. These factors are standardised into **z-scores** and combined into a **single multi-factor score** to rank stocks.  
+This app provides a hands-on environment for exploring systematic factor-based investing. It retrieves **5 years of adjusted close prices** and **live market capitalisation data** for any user-selected stock tickers, then computes three investment factors: **12-month momentum**, **annualised volatility**, and **size**. These factors are standardised into **z-scores** and combined into a **single multi-factor score** to rank stocks.<br>
+
 The top-scoring names are selected into an **equal-weight portfolio**, which is then **backtested using monthly returns and rebalancing**. The app displays cumulative performance, total return, annualised volatility, and an approximate Sharpe ratio through an interactive Streamlit interface.
 
 
