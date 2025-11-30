@@ -1,0 +1,2 @@
+# Simulator-for-Factor-Based-Stock-Selection-and-Portfolio-Backtesting
+This app downloads 5 years of price data and live market caps for user-selected tickers, then calculates momentum, volatility, and size factors. It converts these into z-scores, builds a combined factor score, and selects the top N stocks. The chosen portfolio is then backtested monthly, showing cumulative returns and basic performance stats.
