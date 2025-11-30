@@ -29,30 +29,31 @@ The top-scoring names are selected into an **equal-weight portfolio**, which is 
 
 **Interactive Visualisation**  
   Streamlit + Plotly charts for equity curves and factor tables.
-
+  
 
 ## Project Structure
+```
 factor_simulator
 ├── app.py
 ├── factors.py
 ├── portfolio.py
 ├── backtest.py
 └── requirements.txt
+```
 
-
-
-## Installation (Bash)
------------------------------------------------------------------------------------------------------------
+## Installation
+```bash
 git clone https://github.com/nauxiuh/Simulator-for-Factor-Based-Stock-Selection-and-Portfolio-Backtesting
 cd factor_simulator
 pip install -r requirements.txt
-------------------------------------------------------------------------------------------------------------
+```
+
 ## Usage
 
-1. Run the Streamlit interface (Bash):
-----------------------
+1. Run the Streamlit interface:
+```bash
 streamlit run app.py
-----------------------
+```
 2. Enter a list of stock tickers (e.g., AAPL, MSFT, GOOGL, AMZN, META) and choose how many top-ranked stocks to include in the portfolio.
 Click Run Simulation to download data, compute factor scores, build the portfolio, and generate a full backtest.
 
