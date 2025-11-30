@@ -8,7 +8,7 @@ from portfolio import build_factor_score, select_stocks
 from backtest import backtest
 
 # --- App title ---
-st.title("Systematic Factor Strategy Workbench")
+st.title("📈 Systematic Factor Strategy Workbench")
 
 # --- User inputs ---
 tickers_input = st.text_input(
@@ -26,7 +26,7 @@ if st.button("Run Simulation"):
         st.stop()
 
     st.write("Loading data...")
-    raw_data = yf.download(tickers, period="5y")
+    raw_data = yf.download(tickers, period="5y")  # auto_adjust=True by default now
 
     if raw_data.empty:
         st.error("No data was downloaded. Please check your tickers or try again later.")
@@ -34,22 +34,28 @@ if st.button("Run Simulation"):
 
     # Handle both single-index and multi-index column formats from yfinance
     if isinstance(raw_data.columns, pd.MultiIndex):
-        # Typical yfinance shape for multiple tickers: columns like (ticker, field)
-        # e.g. ('AAPL', 'Adj Close'), ('MSFT', 'Adj Close'), ...
+        # For multiple tickers: columns like (ticker, field), e.g. ('AAPL', 'Close')
         try:
-            price_df = raw_data.xs("Adj Close", level=1, axis=1)
+            price_df = raw_data.xs("Close", level=1, axis=1)
         except KeyError:
-            st.error("Could not find 'Adj Close' in downloaded data. Please check your tickers.")
+            st.error("Could not find 'Close' prices in downloaded data. Please check your tickers.")
             st.write("Columns found:", list(raw_data.columns))
             st.stop()
     else:
-        # Single-index columns, e.g. for one ticker or older yfinance behaviour
-        if "Adj Close" not in raw_data.columns:
-            st.error("Downloaded data does not contain an 'Adj Close' column.")
+        # For a single ticker: columns like ['Open','High','Low','Close',...]
+        col_to_use = None
+        if "Adj Close" in raw_data.columns:
+            col_to_use = "Adj Close"
+        elif "Close" in raw_data.columns:
+            col_to_use = "Close"
+
+        if col_to_use is None:
+            st.error("Downloaded data does not contain 'Close' or 'Adj Close' columns.")
             st.write("Columns found:", list(raw_data.columns))
             st.stop()
-        adj = raw_data["Adj Close"]
-        price_df = adj.to_frame() if not isinstance(adj, pd.DataFrame) else adj
+
+        adj_or_close = raw_data[col_to_use]
+        price_df = adj_or_close.to_frame() if not isinstance(adj_or_close, pd.DataFrame) else adj_or_close
 
     # Drop rows with missing prices
     price_df = price_df.dropna(how="any")
@@ -58,13 +64,12 @@ if st.button("Run Simulation"):
         st.error("Price data is empty after dropping missing values. Try different tickers or period.")
         st.stop()
 
-    # --- REAL market caps using price × shares outstanding (Option B) ---
+    # Real market caps using price × shares outstanding
     st.write("Fetching shares outstanding and computing market caps...")
     mcaps = {}
     for t in price_df.columns:
         try:
             ticker = yf.Ticker(t)
-            # get_shares_full returns a time series of shares outstanding
             shares_series = ticker.get_shares_full(start="2000-01-01")
             if shares_series is None or len(shares_series) == 0:
                 raise ValueError("No shares data returned")
@@ -74,11 +79,10 @@ if st.button("Run Simulation"):
 
             mcaps[t] = latest_price * latest_shares
         except Exception as e:
-            # Fallback: if we can't get shares, approximate with a dummy constant
-            # so the app still runs (but size factor is less meaningful for that ticker).
+            # Fallback so the app still runs even if shares data is missing
             st.warning(f"Could not fetch full shares data for {t}: {e}. Using fallback market cap.")
             latest_price = float(price_df[t].iloc[-1])
-            mcaps[t] = latest_price * 1e9  # e.g. assume 1 billion shares
+            mcaps[t] = latest_price * 1e9  # assume 1 billion shares as a rough placeholder
 
     market_caps = pd.Series(mcaps, index=price_df.columns)
 
