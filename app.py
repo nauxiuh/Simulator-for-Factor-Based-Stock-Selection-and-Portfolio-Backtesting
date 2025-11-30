@@ -8,7 +8,7 @@ from portfolio import build_factor_score, select_stocks
 from backtest import backtest
 
 # --- App title ---
-st.title("📈 Factor Investing Simulator")
+st.title("Factor Investing Simulator")
 
 # --- User inputs ---
 tickers = st.text_input("Enter tickers (comma-separated):", "AAPL,MSFT,GOOGL,AMZN,TSLA,META")
