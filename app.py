@@ -48,7 +48,8 @@ if st.button("Run Simulation"):
             st.error("Downloaded data does not contain an 'Adj Close' column.")
             st.write("Columns found:", list(raw_data.columns))
             st.stop()
-        price_df = raw_data["Adj Close"].to_frame() if not isinstance(raw_data["Adj Close"], pd.DataFrame) else raw_data["Adj Close"]
+        adj = raw_data["Adj Close"]
+        price_df = adj.to_frame() if not isinstance(adj, pd.DataFrame) else adj
 
     # Drop rows with missing prices
     price_df = price_df.dropna(how="any")
@@ -57,11 +58,29 @@ if st.button("Run Simulation"):
         st.error("Price data is empty after dropping missing values. Try different tickers or period.")
         st.stop()
 
-    # Fake market caps (for demo)
-    market_caps = pd.Series(
-        {t: yf.Ticker(t).info.get("marketCap", 1e10) for t in price_df.columns},
-        index=price_df.columns,
-    )
+    # --- REAL market caps using price × shares outstanding (Option B) ---
+    st.write("Fetching shares outstanding and computing market caps...")
+    mcaps = {}
+    for t in price_df.columns:
+        try:
+            ticker = yf.Ticker(t)
+            # get_shares_full returns a time series of shares outstanding
+            shares_series = ticker.get_shares_full(start="2000-01-01")
+            if shares_series is None or len(shares_series) == 0:
+                raise ValueError("No shares data returned")
+
+            latest_shares = float(shares_series.iloc[-1])
+            latest_price = float(price_df[t].iloc[-1])
+
+            mcaps[t] = latest_price * latest_shares
+        except Exception as e:
+            # Fallback: if we can't get shares, approximate with a dummy constant
+            # so the app still runs (but size factor is less meaningful for that ticker).
+            st.warning(f"Could not fetch full shares data for {t}: {e}. Using fallback market cap.")
+            latest_price = float(price_df[t].iloc[-1])
+            mcaps[t] = latest_price * 1e9  # e.g. assume 1 billion shares
+
+    market_caps = pd.Series(mcaps, index=price_df.columns)
 
     # Calculate factors
     st.write("Calculating factors...")
