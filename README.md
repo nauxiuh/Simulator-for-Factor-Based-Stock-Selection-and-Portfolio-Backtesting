@@ -33,7 +33,7 @@ The top-ranked names are selected into a portfolio and can be tested using eithe
 
 ## Project Structure
 ```
-factor_simulator
+Systematic Multi-Factor Portfolio Optimisation and Backtesting Simulator
 ├── app.py
 ├── factors.py
 ├── portfolio.py
