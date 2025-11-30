@@ -10,24 +10,24 @@ The top-scoring names are selected into an **equal-weight portfolio**, which is 
 
 ## Features
 
-**Live Data Retrieval**  
+- **Live Data Retrieval**  
   Pulls 5 years of historical price data and real-time market caps using `yfinance`.
 
-**Factor Computation**  
+- **Factor Computation**  
   - Momentum: 12-month return  
   - Volatility: annualised standard deviation of daily returns  
   - Size: market capitalisation
 
-**Multi-Factor Scoring**  
+- **Multi-Factor Scoring**  
   Converts factors into z-scores and combines them into a single weighted score.
 
-**Portfolio Construction**  
+- **Portfolio Construction**  
   Selects the top *N* ranked stocks to form an equal-weight strategy.
 
-**Monthly Backtesting**  
+- **Monthly Backtesting**  
   Computes monthly returns, cumulative performance, and risk metrics.
 
-**Interactive Visualisation**  
+- **Interactive Visualisation**  
   Streamlit + Plotly charts for equity curves and factor tables.
   
 
