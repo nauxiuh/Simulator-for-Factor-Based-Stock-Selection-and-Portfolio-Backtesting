@@ -1,4 +1,4 @@
-# Systematic Factor Strategy Workbench  
+# Simulator for Factor-Based Stock Selection and Portfolio Backtesting
 *A tool for constructing and backtesting systematic multi-factor equity portfolios using live market data.*
 
 
