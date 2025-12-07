@@ -74,10 +74,10 @@ streamlit run app.py
    - **Size**: real market capitalisation (`price × shares outstanding`)
 
 3. **Standardise factors**  
-   - Converts raw factor values into z-scores for comparability.
+   - Converts raw factor values into z-scores (and applies a small-cap tilt to the size factor) for comparability.
 
 4. **Build composite factor score**  
-   - Standardises factors into z-scores, applies a small-cap tilt to the size factor, and combines them into a single weighted multi-factor score.
+   - Computes a weighted sum of all factor z-scores.
 
 5. **Select top-ranked stocks**  
    - Picks the highest-scoring stocks for portfolio inclusion.
