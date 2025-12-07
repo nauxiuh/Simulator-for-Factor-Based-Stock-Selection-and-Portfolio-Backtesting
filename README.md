@@ -77,7 +77,7 @@ streamlit run app.py
    - Converts raw factor values into z-scores for comparability.
 
 4. **Build composite factor score**  
-   - Computes a weighted sum of all factor z-scores.
+   - Standardises factors into z-scores, applies a small-cap tilt to the size factor, and combines them into a single weighted multi-factor score.
 
 5. **Select top-ranked stocks**  
    - Picks the highest-scoring stocks for portfolio inclusion.
